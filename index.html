@@ -145,11 +145,12 @@ $('digButton').addEventListener('click',async()=>{
  $('treasureOverlay').classList.remove('hidden');$('chest').classList.remove('open');$('chest').style.animation='none';void $('chest').offsetWidth;$('chest').style.animation='';$('phaseCircle').style.background='#8c969f';$('phaseCircle').style.borderColor='#d4d9df';$('treasureStatus').textContent='Сундук найден…';$('treasureMult').textContent='';
  await wait(950);
  const phases=selectedMode==='danger'?5:band.phase;
+ const totalPhases=selectedMode==='danger'?5:4;
  const colors=['#aeb7c1','#e8c94b','#f0717d','#b58af5','#f5c451'];
  for(let i=0;i<phases;i++){
    $('phaseCircle').style.background=colors[i];$('phaseCircle').style.borderColor='#ffffff';
    $('phaseCircle').classList.remove('pulse');void $('phaseCircle').offsetWidth;$('phaseCircle').classList.add('pulse');sparkle(colors[i]);
-   $('treasureStatus').textContent=selectedMode==='danger'&&i===4?'Фаза 5 из 5 — открываем сундук':`Фаза ${i+1} из ${phases}`;$('treasureMult').textContent='✦';await wait(1000);
+   $('treasureStatus').textContent=selectedMode==='danger'&&i===4?'Фаза 5 из 5 — открываем сундук':`Фаза ${i+1} из ${totalPhases}`;$('treasureMult').textContent='✦';await wait(1000);
  }
  $('chest').classList.add('open');$('treasureStatus').textContent='Клад найден!';
  await wait(700);
