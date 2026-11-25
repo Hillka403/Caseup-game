@@ -46,7 +46,7 @@ h2{font-size:19px;margin:0 0 12px}.muted,.statlabel{color:var(--muted);font-size
 const CASES = [{"id":"ordinary","name":"⚪️ Обычный","price":100,"drops":[["Обычный","Амулет",40,50],["Обычный","Каменный амулет",80,30],["Обычный","Водный амулет",135,15],["Редкий","Красный броник",225,5]]},{"id":"rare","name":"✨ Редкий","price":250,"drops":[["Редкий","Каменный броник",145,50],["Редкий","Железная руда",200,25],["Редкий","Золото",325,13],["Редкий","Алмаз",450,10],["Эпический","Изумруд",675,2]]},{"id":"diamond","name":"💎 Алмазный","price":500,"drops":[["Редкий","Золото",325,40],["Редкий","Каменный алмаз",390,30],["Эпический","Каменный изумруд",525,15],["Эпический","Аметист",775,10],["Эпический","Эмеральд",1025,5]]},{"id":"rune","name":"⚡️ Рунический","price":1000,"drops":[["Эпический","Руна молнии",400,40],["Эпический","Руна силы",700,25],["Эпический","Руна",1100,20],["Эпический","Руна камня",1500,10],["Легендарный","Рунный камень",2250,5]]},{"id":"legends","name":"⚜️ Легенды","price":2500,"drops":[["Эпический","Руна камня",1500,50],["Легендарный","Рунный камень",2250,20],["Легендарный","Рунный броник",2725,15],["Легендарный","Рунное золото",3350,10],["Легендарный","Рунный алмаз",3975,5]]},{"id":"amethyst","name":"🪎 Аметистовый","price":5000,"drops":[["Легендарный","Амулет рун",2250,30],["Легендарный","Рунный меч",3750,25],["Легендарный","Аметистовый броник",4800,20],["Легендарный","Руна аметиста",6100,15],["Легендарный","Аметистовый амулет",7520,7],["Легендарный","Аметист",9500,3]]},{"id":"eternal","name":"🪐 Вечный","price":10000,"drops":[["Легендарный","Каменный сапфир",6000,55],["Легендарный","Сапфир",9500,20],["Мифический","Руна вечности",12500,15],["Мифический","Сапфировый меч",15000,6],["Мифический","Меч вечности",18500,4]]},{"id":"cobra","name":"🐍 Кобра","price":25000,"drops":[["Мифический","Руна вечности",12500,25],["Мифический","Камень вечности",17200,15],["Мифический","Вечный меч",22300,15],["Мифический","Амулет вечности",27900,15],["Мифический","Каменный нефрит",34700,15],["Вечный","Нефритовый броник",40000,10],["Вечный","Нефритовая руна",54200,3],["Вечный","Кровавый амулет",63500,2]]}];
 const KEY='caseup_player_v1', $=id=>document.getElementById(id);
 let state=load(),selected=0,lastDrop=null,chosenTarget=null,spinning=false,upgradeBusy=false,treasureBusy=false,selectedMode='easy',chainCount=0;
-function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&typeof x.balance==='number'&&Array.isArray(x.inventory))return x}catch(e){}return{balance:500,inventory:[],bonusAt:0}}
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&typeof x.balance==='number'&&Array.isArray(x.inventory)){if(x.pendingTreasure){x.balance+=Number(x.pendingTreasure.payout)||0;x.lastTreasureRecovery=Date.now();x.pendingTreasure=null;localStorage.setItem(KEY,JSON.stringify(x))}return x}}catch(e){}return{balance:500,inventory:[],bonusAt:0}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 function fmt(n){return Math.round(n).toLocaleString('ru-RU')}
 function iconFor(name,rarity=''){const s=(name+' '+rarity).toLowerCase();if(/амулет/.test(s))return'🔮';if(/меч/.test(s))return'⚔️';if(/броник/.test(s))return'🛡️';if(/руна/.test(s))return'✨';if(/алмаз|сапфир|изумруд|аметист|нефрит|камень/.test(s))return'💎';if(/золото|руда/.test(s))return'🪙';if(/вода/.test(s))return'💧';return'⭐'}
@@ -86,16 +86,21 @@ function runUpgradeStep(sourceIndex,target,isChain){
  const relative=((angle-180)%360+360)%360,delta=Math.min(relative,360-relative),arc=chance*3.6,specialArc=specialSize*3.6;
  const special=specialArc>0&&delta<=specialArc/2,success=delta<=arc/2;
  const duration=4200+Math.random()*2500,spins=5+Math.floor(Math.random()*4),finalAngle=angle,rotation=spins*360+finalAngle;
+ // Commit the outcome before animation: refreshing cannot restore a consumed source item.
+ if(success){
+   if(!special)state.inventory.splice(sourceIndex,1);
+   state.inventory.push({...target});
+   if(isChain)chainCount++;else if(special)chainCount=1;
+ }else if(!isChain){
+   state.inventory.splice(sourceIndex,1);
+ }
+ save();
  $('upgradeButton').disabled=true;$('wheelHint').textContent=isChain?'Особая цепочка улучшений…':'Колесо вращается…';
  $('needle').style.transition=`transform ${duration}ms cubic-bezier(.12,.75,.12,1)`;
  requestAnimationFrame(()=>requestAnimationFrame(()=>$('needle').style.transform=`rotate(${rotation}deg)`));
  setTimeout(()=>{
+   renderInventory();render();
    if(success){
-     if(!special){state.inventory.splice(sourceIndex,1)}
-     state.inventory.push({...target});
-     if(isChain){chainCount++}
-     else if(special){chainCount=1}
-     save();renderInventory();render();
      $('upgradeResult').innerHTML=`<span class="success-text">${special?'🔮 ОСОБЫЙ УСПЕХ!':'✓ УСПЕХ!'} Получен ${target.rarity} ${target.name}${special?' · исходный предмет сохранён':''}</span>`;
      $('successItem').textContent=`${iconFor(target.name,target.rarity)} ${target.rarity} ${target.name}`;
      $('successModal').classList.remove('hidden');
@@ -111,8 +116,6 @@ function runUpgradeStep(sourceIndex,target,isChain){
        setTimeout(()=>{$('successModal').classList.add('hidden');upgradeBusy=false;chainCount=0;chosenTarget=null;render()},1500);
      }
    }else{
-     if(!isChain){state.inventory.splice(sourceIndex,1)}
-     save();renderInventory();
      $('upgradeResult').innerHTML=`<span class="fail-text">✕ НЕУДАЧА! ${isChain?'Предмет сохранён в инвентаре.':src.name+' сгорел.'}</span>`;
      upgradeBusy=false;chainCount=0;chosenTarget=null;render();
    }
@@ -138,7 +141,7 @@ $('digButton').addEventListener('click',async()=>{
  if(stake>state.balance){$('treasureHint').textContent='Недостаточно апов на балансе.';return}
  treasureBusy=true;$('digButton').disabled=true;$('treasureHint').textContent='';
  const band=chooseTreasureBand(selectedMode),mult=band.min+Math.random()*(band.max-band.min),payout=Math.floor(stake*mult);
- state.balance-=stake;save();render();
+ state.balance-=stake;state.pendingTreasure={payout,mult,stake,mode:selectedMode,phase:band.phase};save();render();
  $('treasureOverlay').classList.remove('hidden');$('chest').classList.remove('open');$('chest').style.animation='none';void $('chest').offsetWidth;$('chest').style.animation='';$('phaseCircle').style.background='#8c969f';$('phaseCircle').style.borderColor='#d4d9df';$('treasureStatus').textContent='Сундук найден…';$('treasureMult').textContent='';
  await wait(950);
  const phases=band.phase;
@@ -151,7 +154,7 @@ $('digButton').addEventListener('click',async()=>{
  $('chest').classList.add('open');$('treasureStatus').textContent='Клад найден!';
  await wait(700);
  $('treasureOverlay').classList.add('hidden');
- state.balance+=payout;save();render();
+ state.balance+=payout;state.pendingTreasure=null;save();render();
  $('treasurePayout').textContent=`${fmt(payout)} апов`;
  $('treasureMultiplier').textContent=`Множитель: ${mult.toFixed(2)}х · Ставка: ${fmt(stake)} апов`;
  $('treasureResultModal').classList.remove('hidden');treasureBusy=false;$('digButton').disabled=false;
