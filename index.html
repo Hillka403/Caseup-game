@@ -17,7 +17,7 @@ h2{font-size:19px;margin:0 0 12px}.muted,.statlabel{color:var(--muted);font-size
 @media(max-width:380px){.nav button{font-size:10px}.nav{gap:2px;padding:5px}.nav button{padding:10px 1px}.mode-btn{font-size:12px}}
 </style></head>
 <body><main class="wrap">
-<header class="top"><div class="brand" id="brandHome" role="button" tabindex="0" aria-label="На главную"><div class="logo">🐍 Case<span>Up</span></div><div class="sub">VIRTUAL CASE OPENING</div></div><div class="balance-pill"><span class="coin">🪙</span><span class="balance-value" id="balance">500</span></div></header>
+<header class="top"><div class="brand" id="brandHome" role="button" tabindex="0" aria-label="На главную"><div class="logo">🐍 Case<span>Up</span></div><div class="sub">VIRTUAL CASE OPENING</div></div><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end"><div class="balance-pill"><span class="coin">🪙</span><span class="balance-value" id="balance">500</span></div><button class="secondary" id="addTestAps" style="padding:8px 10px;font-size:11px;border-color:#8a7440;color:#ffe39a">🧪 +5000</button></div></header>
 <nav class="nav"><button class="active" data-tab="cases">📦 Кейсы</button><button data-tab="upgrade">⚡ Апгрейд</button><button data-tab="bonus">🎁 Бонус</button><button data-tab="inventory">🎒 Инвентарь</button><button data-tab="treasure">🪎 Клад</button></nav>
 <section id="cases"><div class="section case-stage"><div class="stage-kicker">МЕНЮ ОТКРЫТИЯ</div><div class="case-title" id="caseName">⚪️ Обычный</div><div class="price" id="casePrice">100 апов</div><div class="case-description">Выбери кейс ниже и попробуй получить предмет</div>
 <div id="reelWrap" class="reel-wrap"><div id="reelTrack" class="reel-track"></div><div class="reel-pointer"></div></div>
@@ -112,6 +112,7 @@ function runUpgradeStep(sourceIndex,target,isChain){
  },duration+100);
 }
 $('upgradeButton').addEventListener('click',()=>{if(upgradeBusy||!chosenTarget)return;const i=Number($('source').value),src=state.inventory[i];if(!src)return;const target={...chosenTarget};const chance=src.value/target.value*100;if(chance>80||chance<=0)return;upgradeBusy=true;chainCount=0;runUpgradeStep(i,target,false)});
+$('addTestAps').addEventListener('click',()=>{state.balance+=5000;save();render();$('addTestAps').textContent='✓ +5000';setTimeout(()=>$('addTestAps').textContent='🧪 +5000',1200)});
 $('claim').addEventListener('click',()=>{if(Date.now()-(state.bonusAt||0)<86400000)return;const amount=50+Math.floor(Math.random()*251);state.balance+=amount;state.bonusAt=Date.now();save();render();$('bonusStatus').textContent='🎉 Получено '+amount+' апов!'});
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
 $('brandHome').addEventListener('click',()=>showTab('cases'));$('brandHome').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showTab('cases')}});
