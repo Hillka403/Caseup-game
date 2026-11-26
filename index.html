@@ -18,7 +18,7 @@ h2{font-size:19px;margin:0 0 12px}.muted,.statlabel{color:var(--muted);font-size
 @media(max-width:380px){.nav button{font-size:10px;letter-spacing:-.4px}.nav{gap:3px;padding:5px}.nav button{padding:7px 0;min-height:43px;height:43px}}
 </style></head>
 <body><main class="wrap">
-<header class="top"><div class="brand" id="brandHome" role="button" tabindex="0" aria-label="На главную"><div class="logo">🐍 Case<span>Up</span></div><div class="sub">VIRTUAL CASE OPENING</div></div><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end"><button class="test-credit" id="add5000" type="button" title="Добавить 5000 апов для тестирования">🧪 +5000</button><div class="balance-pill"><span class="coin">🪙</span><span class="balance-value" id="balance">500</span></div></div></header>
+<header class="top"><div class="brand" id="brandHome" role="button" tabindex="0" aria-label="На главную"><div class="logo">🐍 Case<span>Up</span></div><div class="sub">VIRTUAL CASE OPENING</div></div><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end"><div class="balance-pill"><span class="coin">🪙</span><span class="balance-value" id="balance">500</span></div></div></header>
 <nav class="nav"><button class="active" data-tab="cases">📦 Кейсы</button><button data-tab="upgrade">⚡ Апгрейд</button><button data-tab="treasure">🪎 Клад</button><button data-tab="bonus">🎁 Бонус</button><button data-tab="inventory">🎒 Инвентарь</button></nav>
 <section id="cases"><div class="section case-stage"><div class="stage-kicker">МЕНЮ ОТКРЫТИЯ</div><div class="case-title" id="caseName">⚪️ Обычный</div><div class="price" id="casePrice">100 апов</div><div class="case-description">Выбери кейс ниже и попробуй получить предмет</div>
 <div id="reelWrap" class="reel-wrap"><div id="reelTrack" class="reel-track"></div><div class="reel-pointer"></div></div>
@@ -77,7 +77,6 @@ function renderUpgrade(){
 function makeReel(winner){const c=CASES[selected],arr=[];for(let i=0;i<24;i++){const d=i===19?winner:c.drops[Math.floor(Math.random()*c.drops.length)];arr.push(d)}$('reelTrack').innerHTML=arr.map(d=>`<div class="reel-item"><span class="item-icon">${iconFor(d[1],d[0])}</span><small>${d[1]}</small></div>`).join('');$('reelTrack').style.transition='none';$('reelTrack').style.transform='translateX(0px)';$('reelWrap').classList.remove('hidden');$('caseResult').classList.add('hidden');return 19}
 $('caseGrid').addEventListener('click',e=>{const b=e.target.closest('[data-case]');if(!b||spinning)return;selected=+b.dataset.case;lastDrop=null;$('open').classList.remove('hidden');$('caseResult').classList.add('hidden');$('reelWrap').classList.remove('hidden');renderCases()});
 $('open').addEventListener('click',()=>{if(spinning)return;const c=CASES[selected];if(state.balance<c.price)return;state.balance-=c.price;const d=weightedDrop(c.drops),winner=makeReel(d);lastDrop={rarity:d[0],name:d[1],value:d[2]};state.inventory.push(lastDrop);save();spinning=true;$('open').disabled=true;render();requestAnimationFrame(()=>requestAnimationFrame(()=>{const track=$('reelTrack'),wrap=$('reelWrap'),item=track.children[winner],distance=item.offsetLeft+item.offsetWidth/2-wrap.clientWidth/2;const caseDuration=fastCase?1000:6400;track.style.transition=`transform ${caseDuration}ms cubic-bezier(.08,.72,.12,1)`;track.style.transform=`translateX(${-distance}px)`}));setTimeout(()=>{spinning=false;$('reelWrap').classList.add('hidden');$('caseResult').classList.remove('hidden');$('caseResult').innerHTML=`<div class="result-panel"><div class="stage-kicker">ТВОЙ ПРЕДМЕТ</div><div class="result-icon">${iconFor(d[1],d[0])}</div><div class="result-name">${d[0]} ${d[1]}</div><div class="result-value">${fmt(d[2])} апов</div></div><div class="actions"><button class="secondary" id="sellDrop">Продать · ${fmt(d[2])}</button><button class="primary" id="openAgain">Открыть ещё</button></div>`;$('open').classList.add('hidden');$('openAgain').addEventListener('click',()=>{$('open').classList.remove('hidden');$('caseResult').classList.add('hidden');$('reelWrap').classList.remove('hidden');lastDrop=null;renderCases();$('open').click()});$('sellDrop').addEventListener('click',()=>{const idx=state.inventory.lastIndexOf(lastDrop);if(idx>=0){state.inventory.splice(idx,1);state.balance+=d[2]}lastDrop=null;save();$('open').classList.remove('hidden');$('caseResult').classList.add('hidden');$('reelWrap').classList.remove('hidden');render();});render()},fastCase?1100:6500)});
-$('add5000').addEventListener('click',()=>{state.balance+=5000;save();render()});
 $('fastUpgradeToggle').addEventListener('click',()=>{fastUpgrade=!fastUpgrade;$('fastUpgradeToggle').classList.toggle('active',fastUpgrade);$('fastUpgradeToggle').setAttribute('aria-pressed',String(fastUpgrade))});
 $('fastCaseToggle').addEventListener('click',()=>{fastCase=!fastCase;$('fastCaseToggle').classList.toggle('active',fastCase);$('fastCaseToggle').setAttribute('aria-pressed',String(fastCase))});
 $('items').addEventListener('click',e=>{const b=e.target.closest('[data-sell]');if(!b||upgradeBusy)return;const it=state.inventory.splice(+b.dataset.sell,1)[0];if(!it)return;state.balance+=it.value;save();render()});
@@ -131,15 +130,15 @@ document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()
 $('brandHome').addEventListener('click',()=>showTab('cases'));$('brandHome').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showTab('cases')}});
 const TREASURE_PHASES=[
  {min:.10,max:.20,color:'#c4ccd5',icon:'⚪️',name:'Обычная'},
- {min:.21,max:.40,color:'#f2d34f',icon:'🟡',name:'Золотая'},
- {min:.41,max:.60,color:'#ff963d',icon:'🟠',name:'Огненная'},
- {min:.61,max:.80,color:'#49d18d',icon:'🟢',name:'Изумрудная'},
- {min:.81,max:1.10,color:'#42a5ff',icon:'🔵',name:'Сапфировая'},
- {min:1.11,max:1.50,color:'#b58aff',icon:'🟣',name:'Аметистовая'},
- {min:1.51,max:2.30,color:'#111827',icon:'⚫️',name:'Тёмная'},
- {min:2.31,max:3.50,color:'#f05261',icon:'🔴',name:'Кровавая'},
- {min:3.50,max:5.10,color:'rainbow',icon:'🌈',name:'Радужная'},
- {min:5.11,max:7.50,color:'#ffe36e',icon:'👑✨',name:'Легендарная'}
+ {min:.21,max:.30,color:'#f2d34f',icon:'🟡',name:'Золотая'},
+ {min:.31,max:.50,color:'#ff963d',icon:'🟠',name:'Огненная'},
+ {min:.51,max:.70,color:'#49d18d',icon:'🟢',name:'Изумрудная'},
+ {min:.71,max:.90,color:'#42a5ff',icon:'🔵',name:'Сапфировая'},
+ {min:.91,max:1.20,color:'#b58aff',icon:'🟣',name:'Аметистовая'},
+ {min:1.21,max:1.80,color:'#111827',icon:'⚫️',name:'Тёмная'},
+ {min:1.81,max:2.30,color:'#f05261',icon:'🔴',name:'Кровавая'},
+ {min:2.31,max:3.40,color:'rainbow',icon:'🌈',name:'Радужная'},
+ {min:3.41,max:5.50,color:'#ffe36e',icon:'👑✨',name:'Легендарная'}
 ];
 function chooseTreasurePhase(){return Math.floor(Math.random()*TREASURE_PHASES.length)}
 function sparkle(color){
