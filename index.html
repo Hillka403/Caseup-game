@@ -14,6 +14,47 @@ h2{font-size:19px;margin:0 0 12px}.muted,.statlabel{color:var(--muted);font-size
 .action-row{display:flex;gap:8px;align-items:stretch;margin-top:13px}.action-row .upgrade-action{flex:1;min-width:0;margin-top:0}.quick-toggle{flex:0 0 54px;width:54px;border:1px solid #465365;border-radius:11px;background:linear-gradient(145deg,#293443,#1b2634);color:#9aa9bd;display:grid;place-items:center;cursor:pointer;transition:background .18s,border-color .18s,color .18s,box-shadow .18s}.quick-toggle .bolt{font-size:29px;line-height:1;font-weight:900}.quick-toggle.active{background:linear-gradient(145deg,#1d6049,#174332);border-color:#31c48d;color:#63f0b5;box-shadow:0 0 14px #31c48d35}.case-open-row{display:flex;gap:8px;align-items:stretch}.case-open-row #open{flex:1}.case-open-row .quick-toggle{flex-basis:54px;width:54px}.special-marker{display:none}.special-marker.active{display:block}.success-text{color:var(--accent)}.fail-text{color:var(--red)}
 .success-modal,.treasure-result-modal{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;background:#050a10b8;backdrop-filter:blur(5px)}.success-card,.treasure-result-card{width:min(420px,90vw);text-align:center;padding:24px 18px;border:1px solid #348d6e;border-radius:18px;background:linear-gradient(145deg,#1a3d32,#142333);box-shadow:0 20px 70px #000b;animation:pop .28s ease-out}.success-card h3,.treasure-result-card h3{margin:0 0 12px;font-size:22px;color:#7ff0bd}.success-card p{margin:0;line-height:1.5}.success-card .got-item{font-weight:900;color:var(--gold)}@keyframes pop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
 .treasure-intro{text-align:center}.treasure-title{font-size:26px;font-weight:950;margin:0 0 10px}.treasure-desc{color:var(--muted);line-height:1.65;font-size:13px}.treasure-form{display:grid;gap:12px;margin-bottom:15px}.mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.mode-btn{border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--text);padding:13px 5px;font-weight:850;cursor:pointer}.mode-btn small{display:block;color:var(--muted);font-weight:600;font-size:10px;margin-top:5px}.mode-btn.selected{border-color:var(--gold);background:#3b3421;color:#ffe39a}.treasure-overlay{position:fixed;inset:0;z-index:70;background:#050a10d9;display:flex;align-items:center;justify-content:center;padding:18px}.treasure-stage{width:min(440px,94vw);min-height:340px;border:1px solid #46576b;border-radius:22px;background:radial-gradient(ellipse at 50% 80%,#3a321e,#172333 65%);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 20px 70px #000b}.treasure-stage:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,#f5c45122,transparent 48%)}.chest{font-size:100px;z-index:1;filter:drop-shadow(0 10px 15px #0009);animation:chestDrop .85s cubic-bezier(.15,.8,.25,1) both}.chest.open{animation:chestOpen .65s ease-in-out forwards}@keyframes chestDrop{0%{transform:translateY(-260px) scale(.65);opacity:0}70%{transform:translateY(12px) scale(1.05);opacity:1}100%{transform:translateY(0) scale(1)}}@keyframes chestOpen{0%{transform:scale(1)}50%{transform:scale(1.16) rotate(-5deg)}100%{transform:scale(1.05) rotate(4deg)}}.phase-circle{width:23px;height:23px;border-radius:50%;background:#8c969f;border:2px solid #d4d9df;box-shadow:0 0 0 4px #ffffff12;margin:0 0 18px;z-index:2;position:relative}.phase-circle.pulse{animation:tap .28s ease-out}.spark{position:absolute;left:50%;top:50%;font-size:27px;font-weight:950;pointer-events:none;text-shadow:0 0 8px currentColor,0 0 18px currentColor;animation:sparkFly .95s ease-out forwards}@keyframes tap{0%{transform:scale(1)}40%{transform:scale(.75)}100%{transform:scale(1)}}@keyframes sparkFly{0%{opacity:1;transform:translate(-50%,-50%) scale(.5)}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.3)}}.treasure-status{z-index:2;margin-top:18px;color:#dbe5ef;font-size:13px;font-weight:750;text-align:center}.treasure-mult{font-size:23px;color:var(--gold);font-weight:950;margin-top:5px}
+
+/* Cinematic 3D reveal for the rarest item in each case */
+.rare-reveal{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:22px 16px;background:radial-gradient(ellipse at 50% 48%,#172333 0,#080d16 58%,#03060b 100%);overflow:hidden;isolation:isolate}
+.rare-reveal.hidden{display:none!important}
+.rare-reveal-glow{position:absolute;width:min(90vw,520px);height:min(90vw,520px);border-radius:50%;background:radial-gradient(circle,var(--rare-glow,#f5c451) 0,transparent 68%);opacity:.2;filter:blur(18px);transform:scale(.6);transition:opacity .5s,transform .8s;pointer-events:none}
+.rare-reveal.play .rare-reveal-glow{opacity:.42;transform:scale(1.15)}
+.rare-reveal-stars{position:absolute;inset:0;pointer-events:none;overflow:hidden;color:var(--rare-glow,#f5c451)}
+.rare-reveal-stars i{position:absolute;font-style:normal;font-size:20px;opacity:0;text-shadow:0 0 12px currentColor}
+.rare-reveal-stars i:nth-child(1){left:14%;top:24%}.rare-reveal-stars i:nth-child(2){left:78%;top:20%;font-size:27px}.rare-reveal-stars i:nth-child(3){left:19%;top:68%;font-size:28px}.rare-reveal-stars i:nth-child(4){left:82%;top:67%}.rare-reveal-stars i:nth-child(5){left:50%;top:12%;font-size:25px}.rare-reveal-stars i:nth-child(6){left:8%;top:48%}.rare-reveal-stars i:nth-child(7){left:91%;top:45%;font-size:25px}.rare-reveal-stars i:nth-child(8){left:63%;top:78%}
+.rare-reveal.play .rare-reveal-stars i{animation:rareStarPulse 1.4s ease-in-out infinite alternate}
+.rare-reveal.play .rare-reveal-stars i:nth-child(even){animation-delay:.45s}
+@keyframes rareStarPulse{from{opacity:.08;transform:scale(.55) rotate(0)}to{opacity:.95;transform:scale(1.35) rotate(35deg)}}
+.rare-reveal-scene{position:relative;width:min(86vw,350px);height:300px;display:grid;place-items:center;perspective:900px;z-index:1}
+.rare-chest-shadow{position:absolute;left:50%;bottom:32px;width:185px;height:30px;border-radius:50%;background:#000;filter:blur(12px);transform:translateX(-50%) scale(.25);opacity:0}
+.rare-reveal.play .rare-chest-shadow{animation:rareShadow .95s .05s ease-out forwards}
+@keyframes rareShadow{0%{opacity:0;transform:translateX(-50%) scale(.15)}70%{opacity:.65;transform:translateX(-50%) scale(1.15)}100%{opacity:.48;transform:translateX(-50%) scale(1)}}
+.rare-chest{position:absolute;top:50%;left:50%;width:190px;height:145px;transform:translate(-50%,-50%) translateY(-120vh) rotateX(22deg) rotateZ(-9deg);transform-style:preserve-3d;filter:drop-shadow(0 18px 17px #000b);opacity:0}
+.rare-reveal.play .rare-chest{animation:rareChestDrop 1.05s cubic-bezier(.15,.82,.22,1) forwards}
+@keyframes rareChestDrop{0%{opacity:0;transform:translate(-50%,-50%) translateY(-120vh) rotateX(24deg) rotateZ(-12deg) scale(.72)}62%{opacity:1;transform:translate(-50%,-50%) translateY(18px) rotateX(-7deg) rotateZ(3deg) scale(1.04)}78%{transform:translate(-50%,-50%) translateY(-9px) rotateX(4deg) rotateZ(-2deg) scale(.99)}90%{transform:translate(-50%,-50%) translateY(4px) rotateX(-2deg) rotateZ(1deg) scale(1.01)}100%{opacity:1;transform:translate(-50%,-50%) translateY(0) rotateX(0) rotateZ(0) scale(1)}}
+.rare-chest-body{position:absolute;left:0;bottom:0;width:190px;height:105px;border:3px solid #8a5725;border-radius:12px 12px 18px 18px;background:linear-gradient(110deg,#5b3217 0%,#d18a32 18%,#754019 34%,#b86e25 55%,#5a3018 76%,#d18a32 100%);box-shadow:inset 0 8px 12px #ffd27b55,inset 0 -12px 18px #241006aa;transform:translateZ(12px)}
+.rare-chest-body:before{content:"";position:absolute;left:8px;right:8px;top:-9px;height:17px;border:2px solid #f3c16a;border-radius:5px;background:linear-gradient(90deg,#6a3b19,#e5ad50,#784319);transform:translateZ(7px)}
+.rare-chest-front-band{position:absolute;left:calc(50% - 13px);top:0;bottom:0;width:26px;background:linear-gradient(90deg,#8b541e,#f4c66b 45%,#87501e);border-left:2px solid #f6d58a;border-right:2px solid #57300f;box-shadow:0 0 9px #ffd47755}
+.rare-chest-lock{position:absolute;z-index:2;left:calc(50% - 14px);top:35px;width:28px;height:31px;border:3px solid #ffe2a0;border-radius:7px;background:linear-gradient(145deg,#fff0b8,#c8872d 60%,#714015);box-shadow:0 3px 8px #1a0b02}
+.rare-chest-lid{position:absolute;z-index:3;left:-3px;top:-25px;width:196px;height:58px;border:3px solid #a56a2c;border-radius:48% 48% 9px 9px / 30% 30% 10px 10px;background:linear-gradient(100deg,#663918,#d58b32 20%,#f0bd61 43%,#8c4c1b 66%,#d38a35);box-shadow:inset 0 8px 12px #ffe0a055,0 5px 8px #0007;transform-origin:50% 100%;transform:rotateX(0deg) translateZ(18px);backface-visibility:visible}
+.rare-chest-lid-band{position:absolute;left:calc(50% - 13px);top:0;bottom:0;width:26px;background:linear-gradient(90deg,#8b541e,#f4c66b 45%,#87501e);border-left:2px solid #f6d58a;border-right:2px solid #57300f}
+.rare-reveal.open-chest .rare-chest-lid{animation:rareLidOpen .72s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes rareLidOpen{0%{transform:rotateX(0deg) translateZ(18px)}65%{transform:rotateX(-125deg) translateY(-7px) translateZ(22px)}100%{transform:rotateX(-112deg) translateY(-3px) translateZ(22px)}}
+.rare-drop-card{position:absolute;z-index:4;left:50%;top:46%;width:154px;min-height:145px;padding:13px 10px 11px;border:1px solid var(--rare-glow,#f5c451);border-radius:18px;background:linear-gradient(150deg,#26384b,#111b29);box-shadow:0 0 0 1px #fff2,0 0 25px var(--rare-glow,#f5c451),0 0 65px var(--rare-glow,#f5c451);text-align:center;opacity:0;transform:translate(-50%,35px) scale(.35) rotateY(80deg);transform-style:preserve-3d}
+.rare-reveal.revealed .rare-drop-card{animation:rareItemEmerge 1.05s cubic-bezier(.16,.85,.25,1) forwards}
+@keyframes rareItemEmerge{0%{opacity:0;transform:translate(-50%,45px) scale(.25) rotateY(100deg) rotateZ(-12deg)}55%{opacity:1;transform:translate(-50%,-82px) scale(1.12) rotateY(-12deg) rotateZ(4deg)}75%{transform:translate(-50%,-72px) scale(.96) rotateY(8deg) rotateZ(-2deg)}100%{opacity:1;transform:translate(-50%,-76px) scale(1) rotateY(0) rotateZ(0)}}
+.rare-drop-icon{font-size:43px;line-height:1.2;filter:drop-shadow(0 0 12px var(--rare-glow,#f5c451));animation:rareIconFloat 1.6s ease-in-out infinite alternate}
+@keyframes rareIconFloat{from{transform:translateY(2px) rotate(-4deg)}to{transform:translateY(-5px) rotate(4deg)}}
+.rare-drop-name{font-size:12px;font-weight:950;margin-top:7px;line-height:1.2}.rare-drop-value{font-size:11px;color:var(--rare-glow,#f5c451);font-weight:900;margin-top:5px}
+.rare-reveal-caption{z-index:2;min-height:22px;text-align:center;font-size:15px;letter-spacing:1.6px;font-weight:1000;color:var(--rare-glow,#f5c451);text-shadow:0 0 16px var(--rare-glow,#f5c451);opacity:0;transform:translateY(12px)}
+.rare-reveal.revealed .rare-reveal-caption{animation:rareCaption .45s .25s ease-out forwards}
+@keyframes rareCaption{to{opacity:1;transform:translateY(0)}}
+.rare-reveal-actions{z-index:3;display:flex;gap:9px;width:min(360px,92vw);opacity:0;pointer-events:none;transform:translateY(10px)}
+.rare-reveal-actions.ready{animation:rareActions .3s ease-out forwards;pointer-events:auto}
+@keyframes rareActions{to{opacity:1;transform:translateY(0)}}
+.rare-reveal-actions button{flex:1;min-width:0}
+@media(prefers-reduced-motion:reduce){.rare-reveal *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 @media(min-width:650px){.wrap{padding:22px 20px 120px}.case-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.drop-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.upgrade-controls{grid-template-columns:1fr 1fr}.case-title{font-size:25px}}
 @media(max-width:380px){.nav button{font-size:10px;letter-spacing:-.4px}.nav{gap:3px;padding:5px}.nav button{padding:7px 0;min-height:43px;height:43px}}
 </style></head>
@@ -39,6 +80,27 @@ h2{font-size:19px;margin:0 0 12px}.muted,.statlabel{color:var(--muted);font-size
 </div></section>
 <div class="note">CaseUp — развлекательная игра с виртуальными апами и предметами. Апы нельзя купить или вывести за реальные деньги.<br>Прогресс хранится в этом браузере на этом устройстве.</div>
 </main>
+<div id="rareReveal" class="rare-reveal hidden" aria-hidden="true">
+ <div class="rare-reveal-glow" id="rareRevealGlow"></div>
+ <div class="rare-reveal-stars" aria-hidden="true"><i>✦</i><i>✧</i><i>✦</i><i>✧</i><i>✦</i><i>✧</i><i>✦</i><i>✧</i></div>
+ <div class="rare-reveal-scene">
+  <div class="rare-chest-shadow"></div>
+  <div class="rare-chest" id="rareChest">
+   <div class="rare-chest-lid"><div class="rare-chest-lid-band"></div></div>
+   <div class="rare-chest-body"><div class="rare-chest-front-band"></div><div class="rare-chest-lock"></div></div>
+  </div>
+  <div class="rare-drop-card" id="rareDropCard">
+   <div class="rare-drop-icon" id="rareDropIcon">💎</div>
+   <div class="rare-drop-name" id="rareDropName"></div>
+   <div class="rare-drop-value" id="rareDropValue"></div>
+  </div>
+ </div>
+ <div class="rare-reveal-caption" id="rareRevealCaption">НЕВЕРОЯТНЫЙ ДРОП!</div>
+ <div class="rare-reveal-actions" id="rareRevealActions">
+  <button class="secondary" id="rareSell">Продать</button>
+  <button class="primary" id="rareOpenAgain">Открыть ещё</button>
+ </div>
+</div>
 <div id="successModal" class="success-modal hidden"><div class="success-card"><h3>Успешно улучшено!</h3><p><span class="got-item" id="successItem"></span><br>уже у вас в инвентаре!</p></div></div>
 <div id="treasureOverlay" class="treasure-overlay hidden"><div class="treasure-stage"><div class="phase-circle" id="phaseCircle"></div><div class="chest" id="chest">🪎</div><div class="treasure-status" id="treasureStatus">Ищем клад…</div><div class="treasure-mult" id="treasureMult"></div></div></div>
 <div id="treasureResultModal" class="treasure-result-modal hidden"><div class="treasure-result-card"><h3>Вы выкопали клад 🪎</h3><div class="result-icon">💰</div><div class="result-name" id="treasurePayout"></div><div class="muted" id="treasureMultiplier"></div><button class="primary" id="treasureClose" style="width:100%;margin-top:16px">Продолжить</button></div></div>
@@ -77,7 +139,45 @@ function renderUpgrade(force=false,preferredIndex=null){
 }
 function makeReel(winner){const c=CASES[selected],arr=[];for(let i=0;i<24;i++){const d=i===19?winner:c.drops[Math.floor(Math.random()*c.drops.length)];arr.push(d)}$('reelTrack').innerHTML=arr.map(d=>`<div class="reel-item"><span class="item-icon">${iconFor(d[1],d[0])}</span><small>${d[1]}</small></div>`).join('');$('reelTrack').style.transition='none';$('reelTrack').style.transform='translateX(0px)';$('reelWrap').classList.remove('hidden');$('caseResult').classList.add('hidden');return 19}
 $('caseGrid').addEventListener('click',e=>{const b=e.target.closest('[data-case]');if(!b||spinning)return;selected=+b.dataset.case;lastDrop=null;$('open').classList.remove('hidden');$('caseResult').classList.add('hidden');$('reelWrap').classList.remove('hidden');renderCases()});
-$('open').addEventListener('click',()=>{if(spinning)return;const c=CASES[selected];if(state.balance<c.price)return;state.balance-=c.price;const d=weightedDrop(c.drops),winner=makeReel(d);lastDrop={rarity:d[0],name:d[1],value:d[2]};state.inventory.push(lastDrop);save();spinning=true;$('open').disabled=true;render();requestAnimationFrame(()=>requestAnimationFrame(()=>{const track=$('reelTrack'),wrap=$('reelWrap'),item=track.children[winner],distance=item.offsetLeft+item.offsetWidth/2-wrap.clientWidth/2;const caseDuration=fastCase?1000:6400;track.style.transition=`transform ${caseDuration}ms cubic-bezier(.08,.72,.12,1)`;track.style.transform=`translateX(${-distance}px)`}));setTimeout(()=>{spinning=false;$('reelWrap').classList.add('hidden');$('caseResult').classList.remove('hidden');$('caseResult').innerHTML=`<div class="result-panel"><div class="stage-kicker">ТВОЙ ПРЕДМЕТ</div><div class="result-icon">${iconFor(d[1],d[0])}</div><div class="result-name">${d[0]} ${d[1]}</div><div class="result-value">${fmt(d[2])} апов</div></div><div class="actions"><button class="secondary" id="sellDrop">Продать · ${fmt(d[2])}</button><button class="primary" id="openAgain">Открыть ещё</button></div>`;$('open').classList.add('hidden');$('openAgain').addEventListener('click',()=>{$('open').classList.remove('hidden');$('caseResult').classList.add('hidden');$('reelWrap').classList.remove('hidden');lastDrop=null;renderCases();$('open').click()});$('sellDrop').addEventListener('click',()=>{const idx=state.inventory.lastIndexOf(lastDrop);if(idx>=0){state.inventory.splice(idx,1);state.balance+=d[2]}lastDrop=null;save();$('open').classList.remove('hidden');$('caseResult').classList.add('hidden');$('reelWrap').classList.remove('hidden');render();});render()},fastCase?1100:6500)});
+function rarityGlow(rarity){const r=(rarity||'').toLowerCase();if(r.includes('легендар'))return '#ffd45c';if(r.includes('эпич'))return '#b78cff';if(r.includes('мифич'))return '#6d9cff';if(r.includes('вечн'))return '#ff6b91';if(r.includes('редк'))return '#63d4ff';return '#c7d3df'}
+function closeRareReveal(){const el=$('rareReveal');el.classList.add('hidden');el.classList.remove('play','open-chest','revealed');$('rareRevealActions').classList.remove('ready');$('rareReveal').setAttribute('aria-hidden','true')}
+function sellCurrentDrop(){if(!lastDrop)return;const idx=state.inventory.lastIndexOf(lastDrop);if(idx>=0){state.inventory.splice(idx,1);state.balance+=lastDrop.value}lastDrop=null;closeRareReveal();$('open').classList.remove('hidden');$('caseResult').classList.add('hidden');$('reelWrap').classList.remove('hidden');save();render()}
+function openAnotherCase(){closeRareReveal();lastDrop=null;$('open').classList.remove('hidden');$('caseResult').classList.add('hidden');$('reelWrap').classList.remove('hidden');renderCases();$('open').click()}
+function showCaseResult(d){spinning=false;$('open').disabled=state.balance<CASES[selected].price;$('reelWrap').classList.add('hidden');$('caseResult').classList.remove('hidden');$('caseResult').innerHTML=`<div class="result-panel"><div class="stage-kicker">ТВОЙ ПРЕДМЕТ</div><div class="result-icon">${iconFor(d[1],d[0])}</div><div class="result-name">${d[0]} ${d[1]}</div><div class="result-value">${fmt(d[2])} апов</div></div><div class="actions"><button class="secondary" id="sellDrop">Продать · ${fmt(d[2])}</button><button class="primary" id="openAgain">Открыть ещё</button></div>`;$('open').classList.add('hidden');$('openAgain').addEventListener('click',openAnotherCase);$('sellDrop').addEventListener('click',sellCurrentDrop);}
+function startRareReveal(d,track,finalDistance,caseDuration){
+ const overlay=$('rareReveal'),glow=rarityGlow(d[0]);overlay.style.setProperty('--rare-glow',glow);$('rareDropIcon').textContent=iconFor(d[1],d[0]);$('rareDropName').textContent=d[0]+' '+d[1];$('rareDropValue').textContent=fmt(d[2])+' апов';$('rareRevealCaption').textContent='НЕВЕРОЯТНЫЙ ДРОП!';$('rareSell').textContent='Продать · '+fmt(d[2]);
+ overlay.classList.remove('hidden','open-chest','revealed');$('rareRevealActions').classList.remove('ready');overlay.setAttribute('aria-hidden','false');void overlay.offsetWidth;overlay.classList.add('play');
+ // The chest lands and bounces first, then its lid opens and the winning item flies out.
+ setTimeout(()=>overlay.classList.add('open-chest'),1080);
+ setTimeout(()=>{
+   overlay.classList.add('revealed');
+   // The reel that paused at 40% finishes behind the cinematic reveal and stops on the winning item.
+   track.style.transition='transform 900ms cubic-bezier(.12,.78,.16,1)';track.style.transform=`translateX(${-finalDistance}px)`;
+   setTimeout(()=>{spinning=false;$('rareRevealActions').classList.add('ready');},950);
+   // If the player does nothing, return to the normal result card after three seconds.
+   setTimeout(()=>{if(!overlay.classList.contains('hidden')){closeRareReveal();showCaseResult(d)}},3000);
+ },1780);
+}
+$('rareSell').addEventListener('click',sellCurrentDrop);
+$('rareOpenAgain').addEventListener('click',openAnotherCase);
+$('open').addEventListener('click',()=>{
+ if(spinning)return;const c=CASES[selected];if(state.balance<c.price)return;
+ state.balance-=c.price;const d=weightedDrop(c.drops),winner=makeReel(d);lastDrop={rarity:d[0],name:d[1],value:d[2]};
+ // Save the item before any animation starts, so a refresh cannot lose the drop.
+ state.inventory.push(lastDrop);save();spinning=true;$('open').disabled=true;$('caseResult').classList.add('hidden');$('open').classList.remove('hidden');render();
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{
+   const track=$('reelTrack'),wrap=$('reelWrap'),item=track.children[winner],distance=item.offsetLeft+item.offsetWidth/2-wrap.clientWidth/2;
+   const caseDuration=fastCase?1000:6400;
+   const minChance=Math.min(...c.drops.map(x=>x[3]));const isRarest=d[3]===minChance;
+   if(isRarest){
+     const firstPart=caseDuration*.4;track.style.transition=`transform ${firstPart}ms cubic-bezier(.08,.72,.12,1)`;track.style.transform=`translateX(${-distance*.4}px)`;
+     setTimeout(()=>startRareReveal(d,track,distance,caseDuration),firstPart+30);
+   }else{
+     track.style.transition=`transform ${caseDuration}ms cubic-bezier(.08,.72,.12,1)`;track.style.transform=`translateX(${-distance}px)`;
+     setTimeout(()=>showCaseResult(d),caseDuration+100);
+   }
+ }));
+});
 $('fastUpgradeToggle').addEventListener('click',()=>{fastUpgrade=!fastUpgrade;$('fastUpgradeToggle').classList.toggle('active',fastUpgrade);$('fastUpgradeToggle').setAttribute('aria-pressed',String(fastUpgrade))});
 $('fastCaseToggle').addEventListener('click',()=>{fastCase=!fastCase;$('fastCaseToggle').classList.toggle('active',fastCase);$('fastCaseToggle').setAttribute('aria-pressed',String(fastCase))});
 $('items').addEventListener('click',e=>{const b=e.target.closest('[data-sell]');if(!b||upgradeBusy)return;const it=state.inventory.splice(+b.dataset.sell,1)[0];if(!it)return;state.balance+=it.value;save();render()});
