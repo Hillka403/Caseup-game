@@ -27,7 +27,7 @@ h2{font-size:19px;margin:0 0 12px}.muted,.statlabel{color:var(--muted);font-size
 <h2 style="margin-top:18px">📦 Все кейсы</h2><div class="case-grid" id="caseGrid"></div></section>
 <section id="inventory" class="hidden"><h2>🎒 Инвентарь</h2><div id="items"></div></section>
 <section id="upgrade" class="hidden"><h2>⚡ Апгрейд</h2><div class="section"><p class="muted" style="text-align:center;margin-top:0">Выбери исходный предмет и цель. Комиссия апгрейда — 5%.</p>
-<div class="upgrade-layout"><div class="wheel-wrap"><div class="wheel" id="wheel"></div><div class="special-marker" id="specialMarker" aria-hidden="true">🔮</div><div class="needle" id="needle"></div><div class="wheel-center"><div class="chance" id="chance">—%</div><div class="chance-label">ШАНС УСПЕХА</div></div></div><div class="wheel-hint" id="wheelHint">Выбери предмет и цель, чтобы рассчитать шанс</div></div>
+<div class="upgrade-layout"><div class="wheel-wrap"><div class="wheel" id="wheel"></div><div class="special-marker" id="specialMarker" aria-hidden="true">🔮</div><div class="needle" id="needle"></div><div class="wheel-center"><div class="chance" id="chance">—%</div><div class="chance-label">ШАНС УСПЕХА</div><div id="streakIndicator" style="font-size:11px;font-weight:800;color:#31c48d;margin-top:3px;display:none"></div></div></div><div class="wheel-hint" id="wheelHint">Выбери предмет и цель, чтобы рассчитать шанс</div></div>
 <div class="upgrade-controls"><div class="choice-block"><label for="source">ИСХОДНЫЙ ПРЕДМЕТ</label><select id="source"></select><div id="upgradeSource" class="muted"></div></div><div class="choice-block"><label>ЦЕЛЬ АПГРЕЙДА</label><div class="target-list" id="targets"></div></div></div>
 <div class="action-row"><button class="primary upgrade-action" id="upgradeButton" disabled>Апгрейд</button><button class="quick-toggle" id="fastUpgradeToggle" type="button" aria-label="Быстрый апгрейд" aria-pressed="false" title="Быстрый апгрейд"><span class="bolt">⚡</span></button></div><div id="upgradeResult" class="upgrade-result"></div></div></section>
 <section id="bonus" class="hidden"><h2>🎁 Ежедневный бонус</h2><div class="section"><p>Каждые 24 часа можно получить случайный бонус от <b class="price">50 до 300 апов</b>.</p><button class="primary" id="claim">Забрать бонус</button><div id="bonusStatus" class="muted" style="margin-top:12px"></div></div></section>
@@ -56,9 +56,9 @@ function showTab(tab){document.querySelectorAll('[data-tab]').forEach(x=>x.class
 function render(){ $('balance').textContent=fmt(state.balance);renderCases();renderInventory();renderUpgrade();const wait=86400000-(Date.now()-(state.bonusAt||0));$('claim').disabled=wait>0;$('bonusStatus').textContent=wait>0?'Следующий бонус через '+Math.floor(wait/3600000)+' ч. '+Math.floor(wait%3600000/60000)+' мин.':'Бонус доступен!'}
 function renderCases(){const c=CASES[selected];$('caseGrid').innerHTML=CASES.map((x,i)=>`<button class="case ${i===selected?'selected':''}" data-case="${i}"><div class="emoji">${x.name.split(' ')[0]}</div><b>${x.name.substring(x.name.indexOf(' ')+1)}</b><small>${fmt(x.price)} апов</small></button>`).join('');$('caseName').textContent=c.name;$('casePrice').textContent=fmt(c.price)+' апов';$('open').disabled=spinning||state.balance<c.price;$('fastCaseToggle').disabled=spinning;$('caseContents').innerHTML=c.drops.map(d=>`<div class="drop-card"><span class="item-icon">${iconFor(d[1],d[0])}</span><b>${d[0]} ${d[1]}</b><small>${fmt(d[2])} апов · ${d[3]}%</small></div>`).join('');if(!spinning&&!lastDrop){$('reelWrap').classList.remove('hidden');$('caseResult').classList.add('hidden')}}
 function renderInventory(){ $('items').innerHTML=state.inventory.length?state.inventory.map((it,i)=>`<div class="item"><div class="item-main"><span class="item-icon">${iconFor(it.name,it.rarity)}</span><div><span class="rarity">${it.rarity}</span><b>${it.name}</b><span class="muted">${fmt(it.value)} апов</span></div></div><button class="secondary" data-sell="${i}">Продать</button></div>`).join(''):'<div class="empty">Инвентарь пока пуст. Открой первый кейс 📦</div>'}
-function renderUpgrade(){
- if(upgradeBusy)return; // Keep the wheel and its green zone fixed until the needle fully stops.
- const old=$('source').value;
+function renderUpgrade(force=false,preferredIndex=null){
+ if(upgradeBusy&&!force)return; // Keep the wheel fixed while it spins; refresh controls between chain steps.
+ const old=preferredIndex!==null?String(preferredIndex):$('source').value;
  $('source').innerHTML=state.inventory.map((it,i)=>`<option value="${i}">${it.rarity} ${it.name} — ${fmt(it.value)}</option>`).join('');
  if(old!==''&&state.inventory[Number(old)])$('source').value=old;
  const i=Number($('source').value),src=state.inventory[i];
@@ -73,6 +73,7 @@ function renderUpgrade(){
    $('wheel').style.background=special?`conic-gradient(from ${180-arc/2}deg,var(--accent) 0deg,var(--accent) ${specialStart}deg,#f0717d ${specialStart}deg,#f0717d ${specialEnd}deg,var(--accent) ${specialEnd}deg,var(--accent) ${arc}deg,#293849 ${arc}deg,#293849 360deg)`:`conic-gradient(from ${180-arc/2}deg,var(--accent) 0deg,var(--accent) ${arc}deg,#293849 ${arc}deg,#293849 360deg)`;
  }else $('wheel').style.background='conic-gradient(#293849 0deg,#293849 360deg)';
  $('upgradeButton').disabled=!src||!chosenTarget||upgradeBusy;$('wheelHint').textContent=src&&chosenTarget?(chance>=9?'Красная зона 🔮 — особый переход · максимум 76%':'Шанс ниже 9%: особой зоны нет'):'Выбери исходный предмет и цель';
+ const streak=$('streakIndicator');if(streak){if(chainCount>0&&upgradeBusy){streak.textContent='Стрик '+chainCount;streak.style.display='block';streak.style.color=chainCount>=5?'#f0717d':'#31c48d'}else{streak.textContent='';streak.style.display='none'}}
 }
 function makeReel(winner){const c=CASES[selected],arr=[];for(let i=0;i<24;i++){const d=i===19?winner:c.drops[Math.floor(Math.random()*c.drops.length)];arr.push(d)}$('reelTrack').innerHTML=arr.map(d=>`<div class="reel-item"><span class="item-icon">${iconFor(d[1],d[0])}</span><small>${d[1]}</small></div>`).join('');$('reelTrack').style.transition='none';$('reelTrack').style.transform='translateX(0px)';$('reelWrap').classList.remove('hidden');$('caseResult').classList.add('hidden');return 19}
 $('caseGrid').addEventListener('click',e=>{const b=e.target.closest('[data-case]');if(!b||spinning)return;selected=+b.dataset.case;lastDrop=null;$('open').classList.remove('hidden');$('caseResult').classList.add('hidden');$('reelWrap').classList.remove('hidden');renderCases()});
@@ -97,6 +98,7 @@ function runUpgradeStep(sourceIndex,target,isChain){
  }else if(!isChain){
    state.inventory.splice(sourceIndex,1);
  }
+ const streak=$('streakIndicator');if(streak&&chainCount>0){streak.textContent='Стрик '+chainCount;streak.style.display='block';streak.style.color=chainCount>=5?'#f0717d':'#31c48d'}
  save();
  $('upgradeButton').disabled=true;$('specialMarker').classList.add('active');$('wheelHint').textContent=isChain?'Особая цепочка улучшений…':'Колесо вращается…';
  $('needle').style.transition=`transform ${duration}ms cubic-bezier(.12,.75,.12,1)`;
@@ -112,7 +114,7 @@ function runUpgradeStep(sourceIndex,target,isChain){
          if(chainCount>=15){upgradeBusy=false;chainCount=0;chosenTarget=null;$('upgradeResult').textContent='Цепочка завершена: достигнут лимит 15 улучшений.';render();return}
          const newIndex=state.inventory.length-1,next=pickNextTarget(target.value);
          if(!next){upgradeBusy=false;chainCount=0;chosenTarget=null;$('upgradeResult').textContent='Цепочка завершена: больше нет подходящих целей.';render();return}
-         $('source').value=String(newIndex);chosenTarget=next;renderUpgrade();
+         chosenTarget=next;renderUpgrade(true,newIndex);
          setTimeout(()=>runUpgradeStep(newIndex,next,true),1300);
        },1100);
      }else{
