@@ -26,7 +26,7 @@ h2{font-size:19px;margin:0 0 12px}.muted,.statlabel{color:var(--muted);font-size
 <div class="contents"><div class="contents-title">СОДЕРЖИМОЕ ВЫБРАННОГО КЕЙСА</div><div id="caseContents" class="drop-grid"></div></div></div>
 <h2 style="margin-top:18px">📦 Все кейсы</h2><div class="case-grid" id="caseGrid"></div></section>
 <section id="inventory" class="hidden"><h2>🎒 Инвентарь</h2><div id="items"></div></section>
-<section id="upgrade" class="hidden"><h2>⚡ Апгрейд</h2><div class="section"><p class="muted" style="text-align:center;margin-top:0">Выбери исходный предмет и цель. Комиссия апгрейда — 10%.</p>
+<section id="upgrade" class="hidden"><h2>⚡ Апгрейд</h2><div class="section"><p class="muted" style="text-align:center;margin-top:0">Выбери исходный предмет и цель. Комиссия апгрейда — 5%.</p>
 <div class="upgrade-layout"><div class="wheel-wrap"><div class="wheel" id="wheel"></div><div class="special-marker" id="specialMarker" aria-hidden="true">🔮</div><div class="needle" id="needle"></div><div class="wheel-center"><div class="chance" id="chance">—%</div><div class="chance-label">ШАНС УСПЕХА</div></div></div><div class="wheel-hint" id="wheelHint">Выбери предмет и цель, чтобы рассчитать шанс</div></div>
 <div class="upgrade-controls"><div class="choice-block"><label for="source">ИСХОДНЫЙ ПРЕДМЕТ</label><select id="source"></select><div id="upgradeSource" class="muted"></div></div><div class="choice-block"><label>ЦЕЛЬ АПГРЕЙДА</label><div class="target-list" id="targets"></div></div></div>
 <div class="action-row"><button class="primary upgrade-action" id="upgradeButton" disabled>Апгрейд</button><button class="quick-toggle" id="fastUpgradeToggle" type="button" aria-label="Быстрый апгрейд" aria-pressed="false" title="Быстрый апгрейд"><span class="bolt">⚡</span></button></div><div id="upgradeResult" class="upgrade-result"></div></div></section>
@@ -63,16 +63,16 @@ function renderUpgrade(){
  if(old!==''&&state.inventory[Number(old)])$('source').value=old;
  const i=Number($('source').value),src=state.inventory[i];
  $('upgradeSource').textContent=src?`${iconFor(src.name,src.rarity)} ${src.rarity} ${src.name} · ${fmt(src.value)} апов`:'Инвентарь пуст — сначала получи предмет';
- const targets=src?allTargets(src.value):[];
+ const targets=src?allTargets(src.value).filter(t=>src.value/t.value*100<=80):[];
  if(chosenTarget&&!targets.some(t=>t.rarity===chosenTarget.rarity&&t.name===chosenTarget.name))chosenTarget=null;
- $('targets').innerHTML=targets.length?targets.map(t=>{const selected=chosenTarget&&chosenTarget.rarity===t.rarity&&chosenTarget.name===t.name;const ch=src.value/t.value*100*0.9;return `<button class="target ${selected?'selected':''}" data-target="${encodeURIComponent(t.rarity+'|'+t.name+'|'+t.value)}"><span class="target-icon">${iconFor(t.name,t.rarity)}</span><span style="min-width:0;flex:1"><b>${t.rarity} ${t.name}</b><small>${fmt(t.value)} апов · ${ch.toFixed(1)}%</small></span></button>`}).join(''):`<div class="empty" style="grid-column:1/-1">${src?'Нет доступных целей для этого предмета':'Сначала получи предмет'}</div>`;
- const chance=src&&chosenTarget?Math.min(80,src.value/chosenTarget.value*100)*0.9:0,arc=chance*3.6,special=chance>=9?10.8:0;
+ $('targets').innerHTML=targets.length?targets.map(t=>{const selected=chosenTarget&&chosenTarget.rarity===t.rarity&&chosenTarget.name===t.name;const ch=Math.min(80,src.value/t.value*100)*0.95;return `<button class="target ${selected?'selected':''}" data-target="${encodeURIComponent(t.rarity+'|'+t.name+'|'+t.value)}"><span class="target-icon">${iconFor(t.name,t.rarity)}</span><span style="min-width:0;flex:1"><b>${t.rarity} ${t.name}</b><small>${fmt(t.value)} апов · ${ch.toFixed(1)}%</small></span></button>`}).join(''):`<div class="empty" style="grid-column:1/-1">${src?'Нет доступных целей для этого предмета':'Сначала получи предмет'}</div>`;
+ const chance=src&&chosenTarget?Math.min(80,src.value/chosenTarget.value*100)*0.95:0,arc=chance*3.6,special=chance>=9?10.8:0;
  $('chance').textContent=src&&chosenTarget?chance.toFixed(1).replace(/\.0$/,'')+'%':'—%';
  if(arc>0){
    const specialStart=(arc-special)/2,specialEnd=(arc+special)/2;
    $('wheel').style.background=special?`conic-gradient(from ${180-arc/2}deg,var(--accent) 0deg,var(--accent) ${specialStart}deg,#f0717d ${specialStart}deg,#f0717d ${specialEnd}deg,var(--accent) ${specialEnd}deg,var(--accent) ${arc}deg,#293849 ${arc}deg,#293849 360deg)`:`conic-gradient(from ${180-arc/2}deg,var(--accent) 0deg,var(--accent) ${arc}deg,#293849 ${arc}deg,#293849 360deg)`;
  }else $('wheel').style.background='conic-gradient(#293849 0deg,#293849 360deg)';
- $('upgradeButton').disabled=!src||!chosenTarget||upgradeBusy;$('wheelHint').textContent=src&&chosenTarget?(chance>=9?'Красная зона 🔮 — особый переход · максимум 72%':'Шанс ниже 9%: особой зоны нет'):'Выбери исходный предмет и цель';
+ $('upgradeButton').disabled=!src||!chosenTarget||upgradeBusy;$('wheelHint').textContent=src&&chosenTarget?(chance>=9?'Красная зона 🔮 — особый переход · максимум 76%':'Шанс ниже 9%: особой зоны нет'):'Выбери исходный предмет и цель';
 }
 function makeReel(winner){const c=CASES[selected],arr=[];for(let i=0;i<24;i++){const d=i===19?winner:c.drops[Math.floor(Math.random()*c.drops.length)];arr.push(d)}$('reelTrack').innerHTML=arr.map(d=>`<div class="reel-item"><span class="item-icon">${iconFor(d[1],d[0])}</span><small>${d[1]}</small></div>`).join('');$('reelTrack').style.transition='none';$('reelTrack').style.transform='translateX(0px)';$('reelWrap').classList.remove('hidden');$('caseResult').classList.add('hidden');return 19}
 $('caseGrid').addEventListener('click',e=>{const b=e.target.closest('[data-case]');if(!b||spinning)return;selected=+b.dataset.case;lastDrop=null;$('open').classList.remove('hidden');$('caseResult').classList.add('hidden');$('reelWrap').classList.remove('hidden');renderCases()});
@@ -85,7 +85,7 @@ $('targets').addEventListener('click',e=>{const b=e.target.closest('[data-target
 function pickNextTarget(value){return allTargets(value).find(t=>{const c=value/t.value*100;return c>=9&&c<=80})||allTargets(value).find(t=>value/t.value*100<=80)||null}
 function runUpgradeStep(sourceIndex,target,isChain){
  const src=state.inventory[sourceIndex];if(!src||!target){upgradeBusy=false;render();return}
- const chance=Math.min(80,src.value/target.value*100)*0.9,specialSize=chance>=9?3:0,angle=Math.random()*360;
+ const chance=Math.min(80,src.value/target.value*100)*0.95,specialSize=chance>=9?3:0,angle=Math.random()*360;
  const relative=((angle-180)%360+360)%360,delta=Math.min(relative,360-relative),arc=chance*3.6,specialArc=specialSize*3.6;
  const special=specialArc>0&&delta<=specialArc/2,success=delta<=arc/2;
  const duration=fastUpgrade?(700+Math.random()*1100):(4200+Math.random()*2500),spins=fastUpgrade?(2+Math.floor(Math.random()*2)):(5+Math.floor(Math.random()*4)),finalAngle=angle,rotation=spins*360+finalAngle;
