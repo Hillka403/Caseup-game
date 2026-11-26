@@ -273,15 +273,15 @@ document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()
 $('brandHome').addEventListener('click',()=>showTab('cases'));$('brandHome').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showTab('cases')}});
 const TREASURE_PHASES=[
  {min:.10,max:.20,color:'#c4ccd5',icon:'⚪️',name:'Обычная',weight:18},
- {min:.21,max:.40,color:'#f2d34f',icon:'🟡',name:'Золотая',weight:17},
- {min:.41,max:.70,color:'#ff963d',icon:'🟠',name:'Огненная',weight:15},
- {min:.71,max:1.00,color:'#49d18d',icon:'🟢',name:'Изумрудная',weight:14},
- {min:1.01,max:1.30,color:'#42a5ff',icon:'🔵',name:'Сапфировая',weight:12},
- {min:1.31,max:1.90,color:'#b58aff',icon:'🟣',name:'Аметистовая',weight:9},
- {min:1.91,max:3.00,color:'#111827',icon:'⚫️',name:'Тёмная',weight:6},
- {min:3.00,max:4.50,color:'#f05261',icon:'🔴',name:'Кровавая',weight:4},
- {min:4.51,max:6.30,color:'rainbow',icon:'🌈',name:'Радужная',weight:3},
- {min:6.31,max:8.50,color:'#ffe36e',icon:'👑✨',name:'Легендарная',weight:2}
+ {min:.21,max:.33,color:'#f2d34f',icon:'🟡',name:'Золотая',weight:17},
+ {min:.34,max:.55,color:'#ff963d',icon:'🟠',name:'Огненная',weight:15},
+ {min:.56,max:.80,color:'#49d18d',icon:'🟢',name:'Изумрудная',weight:14},
+ {min:.81,max:1.05,color:'#42a5ff',icon:'🔵',name:'Сапфировая',weight:12},
+ {min:1.06,max:1.55,color:'#b58aff',icon:'🟣',name:'Аметистовая',weight:9},
+ {min:1.56,max:2.33,color:'#111827',icon:'⚫️',name:'Тёмная',weight:6},
+ {min:2.34,max:3.60,color:'#f05261',icon:'🔴',name:'Кровавая',weight:4},
+ {min:3.61,max:4.80,color:'rainbow',icon:'🌈',name:'Радужная',weight:3},
+ {min:4.80,max:7.00,color:'#ffe36e',icon:'👑✨',name:'Легендарная',weight:2}
 ];
 function chooseTreasurePhase(){
  const total=TREASURE_PHASES.reduce((sum,p)=>sum+p.weight,0);
